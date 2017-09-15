@@ -1,2 +1,2 @@
-# TBQuke
+# TBQuake
 a quake mod
