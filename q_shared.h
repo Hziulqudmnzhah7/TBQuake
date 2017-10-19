@@ -494,8 +494,20 @@ typedef	int	fixed4_t;
 typedef	int	fixed8_t;
 typedef	int	fixed16_t;
 
+/********TBQoct18**VectorConstants*/
+//const int qu = 0;
+//const quaternion QuatIdentity[] = {0, 0, 0, 1};
+//const quaternion QuatZero[]		= {0, 0, 0, 0};
+//const vec3_t VectRight[]		= {1, 0, 0};
+//#define potato			{0.0f, 1.0f, 0.0f}
+//#define VectUp		new float[]{0, 1, 0}
+//#define VectForward new vec3_t[]{0, 0, 1}
+//#define VectZero    new vec3_t[]{0, 0, 0}
+//#define VectOne		new vec3_t[]{1, 1, 1}
 #ifndef M_PI
 #define M_PI		3.14159265358979323846f	// matches value in gcc v2 math.h
+
+
 #endif
 
 #define NUMVERTEXNORMALS	162
@@ -615,7 +627,7 @@ void ByteToDir( int b, vec3_t dir );
 #define VectorCopy(a,b)			((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2])
 #define	VectorScale(v, s, o)	((o)[0]=(v)[0]*(s),(o)[1]=(v)[1]*(s),(o)[2]=(v)[2]*(s))
 #define	VectorMA(v, s, b, o)	((o)[0]=(v)[0]+(b)[0]*(s),(o)[1]=(v)[1]+(b)[1]*(s),(o)[2]=(v)[2]+(b)[2]*(s))
-/********TBQoct17**betterVectors*/
+/********TBQoct17**bette&rVectors*/
 #define VectorMult(x, s, z)		((z)[0]=(x)[0]*s,(x)[1]=(z)[1]*s,(z)[2]=(x)[2]*s)
 #define VectorProj(x, y, z)		(VectorCopy(y, z), VectorMult(z, DotProduct(x, z) / DotProduct(z, z), z))
 #define VectorSub(a, b, c)		(VectorSubtract(a, b, c))
@@ -722,7 +734,7 @@ static ID_INLINE void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cro
 	cross[2] = v1[0]*v2[1] - v1[1]*v2[0];
 }
 /*********TBQsept29quaternionLib*/
-static void QuatCopy(quaternion a, quaternion b)
+static void QuatCopy(const quaternion a, quaternion b)
 {	
 	int i;
 	for (i = 0; i < 4; i++)
@@ -730,20 +742,93 @@ static void QuatCopy(quaternion a, quaternion b)
 		b[i] = a[i];
 	}
 }
+static float QuatDot (quaternion a, quaternion b)
+{
+	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3];
+}
+static void QuatNorm(quaternion a, quaternion b)
+{
+	float ilength;
+	ilength = Q_rsqrt(QuatDot(a, a));
+	b[0] = a[0] * ilength;
+	b[1] = a[1] * ilength;
+	b[2] = a[2] * ilength;
+	b[3] = a[3] * ilength;
+}
 static void QuatMult(quaternion a, quaternion b, quaternion c)
 {	
-	int i;
-	int j;
-	 
-	for (i = 0; i < 4; i++)
-	{
-		for (j = 0; j < 4; j++)
-		{
-			
-		}
-	}
+	//first * second
+	quaternion f;
+	quaternion s;
+	int x;
+	int y;
+	int z;
+	int w;
+	x = 0;
+	y = 1;
+	z = 2;
+	w = 3;
+	QuatCopy(a, f);
+	QuatCopy(b, s);
+	c[w] = -1 * f[x]*s[x];	c[z] = -1 * f[y]*s[x];	c[y] =  1 * f[z]*s[x];	c[x] =  1 * f[w]*s[x];
+	c[z]+=  1 * f[x]*s[y];	c[w]+= -1 * f[y]*s[y];	c[x]+= -1 * f[z]*s[y];	c[y]+=  1 * f[w]*s[y];
+	c[y]+= -1 * f[x]*s[z];	c[x]+=  1 * f[y]*s[z];	c[w]+= -1 * f[z]*s[z];	c[z]+=  1 * f[w]*s[z];
+	c[x]+=  1 * f[x]*s[w];	c[y]+=  1 * f[y]*s[w];	c[z]+=  1 * f[z]*s[w];	c[w]+=  1 * f[w]*s[w];
+	QuatNorm(c, c);
 }
-//*/
+
+static void QuatApp(vec3_t a, quaternion q, vec3_t c)
+{
+	int x;
+	int y;
+	int z;
+	int w;
+	float num;
+	float num2;
+	float num3;
+	float num4;
+	float num5;
+	float num6;
+	float num7;
+	float num8;
+	float num9;
+	float num10;
+	float num11;
+	float num12;
+	vec3_t v;
+	QuatNorm(q, q);
+	VectorCopy(a, v);
+	x = 0;
+	y = 1;
+	z = 2;
+	w = 3;
+	num = q[x] * 2;
+    num2 = q[y] * 2;
+    num3 = q[z] * 2;
+    num4 = q[x] * num;
+    num5 = q[y] * num2;
+    num6 = q[z] * num3;
+    num7 = q[x] * num2;
+    num8 = q[x] * num3;
+    num9 = q[y] * num3;
+    num10 = q[w] * num;
+    num11 = q[w] * num2;
+    num12 = q[w] * num3;
+    c[x] = (1 - (num5 + num6)) * v[x] + (num7 - num12) * v[y] + (num8 + num11) * v[z];
+    c[y] = (num7 + num12) * v[x] + (1 - (num4 + num6)) * v[y] + (num9 - num10) * v[z];
+    c[z] = (num8 - num11) * v[x] + (num9 + num10) * v[y] + (1 - (num4 + num5)) * v[z];
+}
+static void QuatAngleAxis (float theta, vec3_t axis, quaternion q)
+{
+	int x;
+	int y;
+	int z;
+	int w;
+	q[x] = axis[x] * sin(theta/2);
+	q[y] = axis[y] * sin(theta/2);
+	q[z] = axis[z] * sin(theta/2);
+	q[w] = cos(theta/2);
+}
 #else
 int VectorCompare( const vec3_t v1, const vec3_t v2 );
 
@@ -760,7 +845,12 @@ void VectorNormalizeFast( vec3_t v );
 void VectorInverse( vec3_t v );
 
 void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross );
-
+/*********TBQsept29quaternionLib*/
+static void QuatCopy(const quaternion a, quaternion b);
+static void QuatMult(quaternion a, quaternion b, quaternion c);
+static float QuatDot (quaternion a, quaternion b);
+static void QuatNorm(quaternion a, quaternion b);
+static void QuatApp(vec3_t v, quaternion q, vec3_t out);
 #endif
 
 vec_t VectorNormalize (vec3_t v);		// returns vector length
