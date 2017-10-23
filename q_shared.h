@@ -824,10 +824,22 @@ static void QuatAngleAxis (float theta, vec3_t axis, quaternion q)
 	int y;
 	int z;
 	int w;
+	x = 0;
+	y = 1;
+	z = 2;
+	w = 3;
 	q[x] = axis[x] * sin(theta/2);
 	q[y] = axis[y] * sin(theta/2);
 	q[z] = axis[z] * sin(theta/2);
 	q[w] = cos(theta/2);
+}
+static void QuatInv (quaternion q, quaternion c)
+{
+	QuatNorm(q, q);
+	c[0] = - 1 * q[0];
+	c[1] = - 1 * q[1];
+	c[2] = - 1 * q[2];
+	c[3] = q[3];
 }
 #else
 int VectorCompare( const vec3_t v1, const vec3_t v2 );
@@ -851,6 +863,7 @@ static void QuatMult(quaternion a, quaternion b, quaternion c);
 static float QuatDot (quaternion a, quaternion b);
 static void QuatNorm(quaternion a, quaternion b);
 static void QuatApp(vec3_t v, quaternion q, vec3_t out);
+static void QuatInv(quaternion q, quaternion c);
 #endif
 
 vec_t VectorNormalize (vec3_t v);		// returns vector length

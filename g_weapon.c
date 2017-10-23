@@ -397,13 +397,23 @@ ROCKET
 
 void Weapon_RocketLauncher_Fire (gentity_t *ent) {
 	gentity_t	*m;
-	//*******TBQoct13*single frame*disabled
-	//for (ent->client->ps.ammo[ ent->client->ps.weapon ] = 99; ent->client->ps.ammo[ ent->client->ps.weapon ] > 0; ent->client->ps.ammo[ ent->client->ps.weapon ]--)
-	//{
-		m = fire_rocket (ent, muzzle, forward);
-	m->damage *= s_quadFactor;
-	m->splashDamage *= s_quadFactor;
-	//}
+	vec3_t axis;
+	int i;
+	int j;
+	quaternion rot;
+	j = 10;
+	VectorCopy(forward, axis);
+	QuatAngleAxis(30.0, up, rot);
+	QuatApp(axis, rot, axis);
+	QuatAngleAxis(360.0 / j, axis, rot);
+	//*******TBQoct13*quaternion rockets*/
+	for (i = 0; i < j; i++)
+	{
+		m = fire_rocket (ent, muzzle, axis);
+		QuatApp(axis, rot, axis);
+		m->damage *= s_quadFactor;
+		m->splashDamage *= s_quadFactor;
+	}
 	
 
 //	VectorAdd( m->s.pos.trDelta, ent->client->ps.velocity, m->s.pos.trDelta );	// "real" physics
