@@ -405,9 +405,9 @@ void Weapon_RocketLauncher_Fire (gentity_t *ent) {
 	VectorCopy(forward, axis);
 	QuatAngleAxis(30.0, up, rot);
 	QuatApp(axis, rot, axis);
-	QuatAngleAxis(360.0 / j, axis, rot);
+	QuatAngleAxis(360.0 / j, forward, rot);
 	//*******TBQoct13*quaternion rockets*/
-	for (i = 0; i < j; i++)
+	for (i = 0; i <= j; i++)
 	{
 		m = fire_rocket (ent, muzzle, axis);
 		QuatApp(axis, rot, axis);
